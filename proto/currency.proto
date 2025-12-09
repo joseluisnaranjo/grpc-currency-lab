@@ -2,35 +2,48 @@ syntax = "proto3";
 
 package currency;
 
-option python_package = "currency_pb2";
-
+// Mensajes para conversión normal
 message ConvertRequest {
-  string from_currency = 1; // e.g. "USD"
-  string to_currency = 2;   // e.g. "EUR"
-  double amount = 3;        // cantidad a convertir
+  string from_currency = 1; 
+  string to_currency = 2;   
+  double amount = 3;        
 }
 
 message ConvertReply {
   double converted_amount = 1;
-  double rate = 2; // tasa usada (to/from)
+  double rate = 2; 
   string from_currency = 3;
   string to_currency = 4;
 }
 
 message Currency {
-  string code = 1; // "USD"
-  string name = 2; // "United States Dollar"
+  string code = 1; 
+  string name = 2; 
 }
 
 message Empty {}
 
+// Mensajes para el DESAFÍO (GetRate)
+message RateRequest {
+  string from_currency = 1;
+  string to_currency = 2;
+}
+
+message RateReply {
+  double rate = 1;
+}
+
+// Definición del Servicio
 service CurrencyConverter {
-  // Conversión simple (unary)
+  // 1. Conversión simple
   rpc Convert(ConvertRequest) returns (ConvertReply);
 
-  // El servidor envía la lista de monedas soportadas (stream)
+  // 2. Lista de monedas
   rpc GetSupportedCurrencies(Empty) returns (stream Currency);
 
-  // (Opcional) El servidor stream de tasas periódicas (simulado)
+  // 3. Stream de tasas
   rpc StreamRates(Empty) returns (stream ConvertReply);
+
+  // 4. NUEVO: Obtener solo la tasa (El desafío)
+  rpc GetRate(RateRequest) returns (RateReply);
 }

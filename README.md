@@ -112,3 +112,13 @@ Para la actividad de extensión (conectar a una API Real), los estudiantes puede
 
 **Pista para la implementación:**
 En `server.py`, pueden importar la librería `requests` (ya incluida en `requirements.txt`) para hacer un `requests.get(url)` dentro de una función auxiliar, y actualizar el diccionario `SIMULATED_RATES` con los valores reales recibidos.
+
+
+## 10. PREGUNTAS DE RELFEXIÓN
+**1. ¿Qué diferencia hay entre una RPC unary y server-streaming?**
+En una RPC Unary, el cliente envía una sola solicitud y recibe una sola respuesta (`Convert`). En Server-Streaming, el cliente envía una solicitud y el servidor responde con una secuencia (flujo) de múltiples mensajes hasta que termina (`GetSupportedCurrencies` o `StreamRates`).
+
+**2. ¿Cómo manejarías el caso de una tasa no encontrada en el servidor?**
+Se utiliza el contexto de gRPC para establecer un código de estado de error y una descripción. En mi código (`server.py`), lo implementé así:
+context.set_code(grpc.StatusCode.NOT_FOUND)
+context.set_details("Tasa no encontrada")

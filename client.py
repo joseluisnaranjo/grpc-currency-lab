@@ -24,15 +24,23 @@ def run():
         print("Convert error:", e)
 
     # 3) Escuchar StreamRates por 5 elementos (server stream)
-    print("\nStream de tasas (ejemplo, 5 items):")
+    print("\nStream de tasas (ejemplo):")
     try:
         stream = stub.StreamRates(currency_pb2.Empty())
         for i, item in enumerate(stream):
             print(f" {i+1}) {item.from_currency} -> {item.to_currency} : rate={item.rate}")
-            if i >= 4:
+            if i >= 20:
                 break
     except grpc.RpcError as e:
         print("StreamRates error:", e)
+
+    print("\n--- TEST DESAFÍO: GetRate ---")
+    try:
+        req = currency_pb2.RateRequest(from_currency="EUR", to_currency="USD")
+        res = stub.GetRate(req)
+        print(f"Tasa directa EUR -> USD: {res.rate}")
+    except grpc.RpcError as e:
+        print("Error:", e)
 
 if __name__ == "__main__":
     run()
