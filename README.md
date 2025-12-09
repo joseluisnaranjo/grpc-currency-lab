@@ -2,6 +2,11 @@
 
 Este laboratorio guía a los estudiantes en la creación, implementación y uso de un servicio gRPC en Python.
 
+## 👤 Autor
+* **Nombre:** Alex Fernando Palma Delgado
+* **Curso:** Arquitectura y Servicios Distribuidos
+* **Rama:** Alex-Palma
+
 ## Resumen del Laboratorio
 
 **Objetivo:** Construir un servicio gRPC que convierta una cantidad entre monedas (p. ej. USD → EUR).
