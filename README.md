@@ -94,7 +94,9 @@ python client.py
 ## 8. Preguntas de Control
 
 - ¿Qué diferencia hay entre una RPC unary y server-streaming?
+Que la comunicacion de RPC es unidireccional y sincrona, en cambio el server streaming es bidireccional y asincrono.
 - ¿Cómo manejarías el caso de una tasa no encontrada en el servidor?
+Pues si la moneda de error no es encontrada o no existe estableceria un error para describir el caso.
 
 ## 9. Sugerencias de APIs para Tasas en Tiempo Real
 
