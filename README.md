@@ -46,10 +46,12 @@ pip install grpcio grpcio-tools protobuf requests
 Para que Python entienda el archivo `.proto`, debemos compilarlo. Desde la raíz del proyecto (`grpc-currency-lab/`), ejecuta:
 
 ```bash
-python -m grpc_tools.protoc -I=./proto --python_out=. --grpc_python_out=. proto/currency.proto
+python -m grpc_tools.protoc -Iproto --python_out=. --grpc_python_out=. proto/currency.proto
 ```
 
 Esto generará `currency_pb2.py` y `currency_pb2_grpc.py`.
+
+**Nota importante:** Si modificas el archivo `.proto`, debes recompilar los stubs con el comando anterior antes de ejecutar el servidor y cliente.
 
 ## 5. Implementación del Servidor (`server.py`)
 
@@ -71,26 +73,59 @@ Para ejecutarlo (en otra terminal):
 python client.py
 ```
 
-## 7. Actividades Sugeridas
+## 7. Actividades Implementadas
 
-1.  **Modificar Tasas:** Agrega soporte para una nueva moneda (ej. JPY) en `server.py`.
-2.  **Manejo de Errores:** Observa qué pasa si pides una conversión de una moneda que no existe.
-3.  **API Real (Extensión):** Intenta conectar el servidor a una API pública de tasas de cambio.
-4.  **Desafío de Modificción de Protocolo (Importante):**
-    *   **Objetivo:** Agregar una nueva función `GetRate` que solo devuelva la tasa de cambio (sin convertir una cantidad).
-    *   **Pasos:**
-        1.  Modificar `proto/currency.proto`:
-            *   Crear mensajes `message RateRequest { string from_currency=1; string to_currency=2; }` y `message RateReply { double rate=1; }`.
-            *   Agregar el método `rpc GetRate(RateRequest) returns (RateReply);` al servicio.
-        2.  **Recompilar los stubs** (paso 4 de esta guía) para que se actualice `currency_pb2_grpc.py`.
-        3.  Implementar el método `GetRate` en `server.py`.
-        4.  Llamarlo desde `client.py`. (¡Si no recompilas, te dará error!)
+### 1.  Agregar soporte para JPY (Japanese Yen)
+Se agregó soporte para la moneda JPY con tasas simuladas:
+- 1 USD = 149.50 JPY
+- 1 EUR = 162.50 JPY
+- 1 GBP = 190.50 JPY
+
+Ver cambios en `SUPPORTED` y `SIMULATED_RATES` en `server.py`.
+
+### 2. Manejo de Errores
+El servidor maneja adecuadamente conversiones de monedas no válidas:
+- Retorna error `NOT_FOUND` con mensaje descriptivo
+- El cliente captura y muestra el error apropiadamente
+- Ver prueba en la sección 5 del cliente
+
+### 3.  API Real - Frankfurter
+El servidor ahora se conecta a la API pública **Frankfurter** para obtener tasas en tiempo real:
+- **Ventaja:** No requiere API Key, es open-source
+- **Fallback:** Si la API falla, usa tasas simuladas
+- **Implementación:** Función `fetch_real_rates()` en `server.py`
+- **URL:** `https://api.frankfurter.app/latest?from=USD&to=EUR`
+
+El servidor intenta primero obtener tasas reales; si falla por timeout o error de red, usa las tasas simuladas.
+
+### 4. Desafío: Nueva función GetRate
+Se implementó una nueva RPC unary llamada **GetRate** que solo devuelve la tasa de cambio sin convertir cantidad.
+
+**Cambios realizados:**
+
+a) Modificar `proto/currency.proto`:
+   - Agregados mensajes `RateRequest` y `RateReply`
+   - Agregado método `rpc GetRate(RateRequest) returns (RateReply);`
+
+b) Recompilar stubs:
+   ```bash
+   python -m grpc_tools.protoc -Iproto --python_out=. --grpc_python_out=. proto/currency.proto
+   ```
+
+c) Implementación en `server.py`:
+   - Método `GetRate()` en clase `CurrencyConverterServicer`
+   - Soporta tasas reales (API Frankfurter) y tasas simuladas
+
+d) Cliente actualizado en `client.py`:
+   - Sección 3: Demuestra uso de `GetRate`
+   - Prueba tasas USD->JPY, EUR->GBP, GBP->EUR
 
 ## 8. Preguntas de Control
 
 - ¿Qué diferencia hay entre una RPC unary y server-streaming?
+ RPC unary es una llamada donde el cliente envía una solicitud y esta recibe una respuesta del servidor, en cambio el server-streaming el clinete también envía una solicitud pero el servidor contesta con múltiples respuestas
 - ¿Cómo manejarías el caso de una tasa no encontrada en el servidor?
-
+El servidor deberá devolver un error gRPC con el código y un mensaje explicando que la tasa no existe para esas monedas.
 ## 9. Sugerencias de APIs para Tasas en Tiempo Real
 
 Para la actividad de extensión (conectar a una API Real), los estudiantes pueden utilizar una de las siguientes opciones gratuitas:
