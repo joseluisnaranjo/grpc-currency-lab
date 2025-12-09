@@ -16,7 +16,7 @@ def run():
         print("Error GetSupportedCurrencies:", e)
 
     # 2) Ejemplo de Convert (unary)
-    req = currency_pb2.ConvertRequest(from_currency="USD", to_currency="EUR", amount=100.0)
+    req = currency_pb2.ConvertRequest(from_currency="USD", to_currency="JPY", amount=100.0)
     try:
         reply = stub.Convert(req)
         print(f"\nConvert {req.amount} {req.from_currency} -> {reply.converted_amount:.4f} {req.to_currency} (rate={reply.rate})")
@@ -33,6 +33,22 @@ def run():
                 break
     except grpc.RpcError as e:
         print("StreamRates error:", e)
+    
+    # 4) Obtener tasas específicas usando GetRate (unary)
+    print("\nObteniendo tasas de conversión:")
+    rate_pairs = [
+        ("USD", "EUR"),
+        ("EUR", "JPY"),
+        ("JPY", "USD"),
+        ("USD", "JPY")
+    ]
+    for from_curr, to_curr in rate_pairs:
+        rate_req = currency_pb2.RateRequest(from_currency=from_curr, to_currency=to_curr)
+        try:
+            rate_reply = stub.GetRate(rate_req)
+            print(f" - {from_curr} -> {to_curr}: {rate_reply.rate}")
+        except grpc.RpcError as e:
+            print(f" - {from_curr} -> {to_curr}: Error - {e.details()}")
 
 if __name__ == "__main__":
     run()

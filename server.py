@@ -6,15 +6,15 @@ import currency_pb2_grpc
 
 # Tasas simuladas: map[from][to] = rate (1 unit of from = rate units of to)
 SIMULATED_RATES = {
-    "USD": {"EUR": 0.92, "GBP": 0.78, "USD": 1.0},
-    "EUR": {"USD": 1.087, "GBP": 0.85, "EUR": 1.0},
-    "GBP": {"USD": 1.28, "EUR": 1.17, "GBP": 1.0},
+    "USD": {"EUR": 0.92, "JPY": 157, "USD": 1.0},
+    "EUR": {"USD": 1.087, "JPY": 182, "EUR": 1.0},
+    "JPY": {"USD": 0.0054, "EUR": 0.0055, "JPY": 1.0},
 }
 
 SUPPORTED = [
     ("USD", "United States Dollar"),
     ("EUR", "Euro"),
-    ("GBP", "British Pound"),
+    ("JPY", "Japanese Yen"),
 ]
 
 class CurrencyConverterServicer(currency_pb2_grpc.CurrencyConverterServicer):
@@ -62,6 +62,25 @@ class CurrencyConverterServicer(currency_pb2_grpc.CurrencyConverterServicer):
                     yield reply
                     time.sleep(0.5)  # espera simulada
             # repetir (podrías agregar lógica para salir si context.is_active() == False)
+    
+    def GetRate(self, request, context):
+        """Obtiene la tasa de conversión entre dos monedas sin realizar la conversión"""
+        from_c = request.from_currency.upper()
+        to_c = request.to_currency.upper()
+        
+        # Buscar la tasa en SIMULATED_RATES
+        rate = None
+        if from_c in SIMULATED_RATES and to_c in SIMULATED_RATES[from_c]:
+            rate = SIMULATED_RATES[from_c][to_c]
+        elif to_c in SIMULATED_RATES and from_c in SIMULATED_RATES[to_c]:
+            # Invertir si está almacenada al revés
+            rate = 1.0 / SIMULATED_RATES[to_c][from_c]
+        else:
+            context.set_code(grpc.StatusCode.NOT_FOUND)
+            context.set_details(f"Rate not found for {from_c} -> {to_c}")
+            return currency_pb2.RateReply()
+
+        return currency_pb2.RateReply(rate=rate)
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
