@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package currency;
 
-option python_package = "currency_pb2";
+//option python_package = "currency_pb2";
 
 message ConvertRequest {
   string from_currency = 1; // e.g. "USD"
