@@ -75,6 +75,7 @@ python client.py
 
 1.  **Modificar Tasas:** Agrega soporte para una nueva moneda (ej. JPY) en `server.py`.
 2.  **Manejo de Errores:** Observa qué pasa si pides una conversión de una moneda que no existe.
+    Si se pide una conversión con una moneda que no existe (por ejemplo "AAA"), el servidor responde con un error gRPC NOT_FOUND, el cliente captura la excepción y muestra un mensaje indicando que la tasa no fue encontrada para esa conversión.
 3.  **API Real (Extensión):** Intenta conectar el servidor a una API pública de tasas de cambio.
 4.  **Desafío de Modificción de Protocolo (Importante):**
     *   **Objetivo:** Agregar una nueva función `GetRate` que solo devuelva la tasa de cambio (sin convertir una cantidad).
@@ -89,7 +90,9 @@ python client.py
 ## 8. Preguntas de Control
 
 - ¿Qué diferencia hay entre una RPC unary y server-streaming?
+En una RPC unary el servidor te responde una sola vez. En cambio, en una server-streaming el servidor te va mandando varios mensajes seguidos, como si fuera una transmisión.
 - ¿Cómo manejarías el caso de una tasa no encontrada en el servidor?
+Si no existe la tasa que piden, primero intento buscarla; y si definitivamente no aparece, simplemente devuelvo un mensaje de error indicando que esa conversión no está disponible.
 
 ## 9. Sugerencias de APIs para Tasas en Tiempo Real
 

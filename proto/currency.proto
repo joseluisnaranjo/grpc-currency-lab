@@ -2,19 +2,17 @@ syntax = "proto3";
 
 package currency;
 
-option python_package = "currency_pb2";
-
 message ConvertRequest {
   string from_currency = 1; // e.g. "USD"
-  string to_currency = 2;   // e.g. "EUR"
-  double amount = 3;        // cantidad a convertir
+  string to_currency   = 2; // e.g. "EUR"
+  double amount        = 3; // cantidad a convertir
 }
 
 message ConvertReply {
   double converted_amount = 1;
-  double rate = 2; // tasa usada (to/from)
-  string from_currency = 3;
-  string to_currency = 4;
+  double rate             = 2; // tasa usada (to/from)
+  string from_currency    = 3;
+  string to_currency      = 4;
 }
 
 message Currency {
@@ -23,6 +21,16 @@ message Currency {
 }
 
 message Empty {}
+
+// ✅ NUEVOS MENSAJES
+message RateRequest {
+  string from_currency = 1;
+  string to_currency   = 2;
+}
+
+message RateReply {
+  double rate = 1;
+}
 
 service CurrencyConverter {
   // Conversión simple (unary)
@@ -33,4 +41,7 @@ service CurrencyConverter {
 
   // (Opcional) El servidor stream de tasas periódicas (simulado)
   rpc StreamRates(Empty) returns (stream ConvertReply);
+
+  // ✅ NUEVO MÉTODO
+  rpc GetRate(RateRequest) returns (RateReply);
 }
