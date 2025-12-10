@@ -89,7 +89,13 @@ python client.py
 ## 8. Preguntas de Control
 
 - ¿Qué diferencia hay entre una RPC unary y server-streaming?
+
+        Una RPC unary es la forma más simple: el cliente envía una sola petición y espera una única respuesta del servidor, piensa en una llamada HTTP típica, es ideal para operaciones puntuales como convierte 10 USD a EUR porque la interacción termina cuando llega la respuesta. En cambio una RPC server-streaming mantiene abierta la conexión y el servidor envía una secuencia de mensajes uno tras otro hasta que decide terminar o el cliente la cancela, es usada cuando el servidor debe empujar actualizaciones periódicas por ejemplo, un stream de tasas que va publicando nuevos valores cada cierto tiempo.
+
+
 - ¿Cómo manejarías el caso de una tasa no encontrada en el servidor?
+
+        Si el servidor no encuentra una tasa, se maneja de forma predecible y explícita: primero validas rápido rechazar monedas desconocidas sin tocar la API, luego intentas obtener la tasa de la caché y si no está llama a la API externa con un timeout corto. Si la API falla, puedes devolver una tasa de fallback local o intentar un pivote ej. calcular A→C vía A→USD→C y, solo si todo eso falla, responder con un error gRPC claro incluyendo un mensaje descriptivo en details. 
 
 ## 9. Sugerencias de APIs para Tasas en Tiempo Real
 
