@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package currency;
 
-option python_package = "currency_pb2";
-
 message ConvertRequest {
   string from_currency = 1; // e.g. "USD"
   string to_currency = 2;   // e.g. "EUR"

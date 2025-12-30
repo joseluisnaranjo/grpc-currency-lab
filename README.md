@@ -31,6 +31,22 @@ El archivo `proto/currency.proto` define los mensajes y servicios. Ver el archiv
 
 Se recomienda usar un entorno virtual (Conda o venv).
 
+```bash
+python -m venv nombre_venv
+```
+
+Activar el entorno virtual
+
+en Windows – PowerShell
+```bash
+.\nombre_venv\Scripts\Activate.ps1
+```
+
+en Windows – CMD
+```bash
+nombre_venv\Scripts\activate
+```
+
 ### Instalación de dependencias
 
 ```bash
@@ -43,10 +59,22 @@ pip install grpcio grpcio-tools protobuf requests
 
 ## 4. Generación de Stubs (Código Python desde Proto)
 
-Para que Python entienda el archivo `.proto`, debemos compilarlo. Desde la raíz del proyecto (`grpc-currency-lab/`), ejecuta:
+Para que Python entienda el archivo `.proto`, debemos compilarlo. 
+
+En la linea de comandos (Linux)
+
+Desde la raíz del proyecto (`grpc-currency-lab/`), ejecuta:
 
 ```bash
 python -m grpc_tools.protoc -I=./proto --python_out=. --grpc_python_out=. proto/currency.proto
+```
+
+Comando en PowerShell (Windows)
+
+Desde el directorio raíz del proyecto (grpc-currency-lab), ejecuta exactamente:
+
+```bash
+python -m grpc_tools.protoc -I ./proto --python_out=. --grpc_python_out=. ./proto/currency.proto
 ```
 
 Esto generará `currency_pb2.py` y `currency_pb2_grpc.py`.
